@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tailor.DataAccess.Context;
 
@@ -11,9 +12,11 @@ using Tailor.DataAccess.Context;
 namespace Tailor.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251203222204_FixCategoryRelation")]
+    partial class FixCategoryRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -677,7 +680,8 @@ namespace Tailor.DataAccess.Migrations
 
                     b.HasKey("ProductPropertyId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductId")
+                        .IsUnique();
 
                     b.ToTable("ProductProperties");
                 });
@@ -1280,8 +1284,8 @@ namespace Tailor.DataAccess.Migrations
             modelBuilder.Entity("Tailor.Entity.Entities.ProductProperty", b =>
                 {
                     b.HasOne("Tailor.Entity.Entities.Product", null)
-                        .WithMany("ProductProperties")
-                        .HasForeignKey("ProductId")
+                        .WithOne("property")
+                        .HasForeignKey("Tailor.Entity.Entities.ProductProperty", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1508,8 +1512,6 @@ namespace Tailor.DataAccess.Migrations
 
                     b.Navigation("ProductDisplays");
 
-                    b.Navigation("ProductProperties");
-
                     b.Navigation("ProductTags");
 
                     b.Navigation("ProductVariants");
@@ -1520,6 +1522,9 @@ namespace Tailor.DataAccess.Migrations
                     b.Navigation("Testimonials");
 
                     b.Navigation("ViewHistories");
+
+                    b.Navigation("property")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.ShoppingCart", b =>

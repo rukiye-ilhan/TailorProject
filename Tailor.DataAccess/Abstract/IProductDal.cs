@@ -9,5 +9,7 @@ namespace Tailor.DataAccess.Abstract
 {
     public interface IProductDal : IGenericDal<Product>
     {
+
+
     }
 }

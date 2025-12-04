@@ -18,9 +18,14 @@ namespace Tailor.Entity.Entities
         public bool IsActive { get; set; }
         public DateTime CretaedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        // Gölge olmaktan çıkarıp gerçek bir mülk haline getiriyoruz:
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
 
         //Foreign ket ve navigasyon propertyleri
-        public ProductProperty property { get; set; }
+        //public ProductProperty property { get; set; } bundan sa çünkü bir ürünün birden fazla özelliği olabilir
+        // Tekil değil, Çoğul (List/Collection) olmalı
+        public ICollection<ProductProperty> ProductProperties { get; set; }
         public Stock Stock { get; set; }
         public ICollection<ProductTag> ProductTags { get; set; }//çoka-çok ilişki
         public ICollection<ProductDisplay> ProductDisplays { get; set; }

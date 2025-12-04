@@ -8,6 +8,8 @@ using Tailor.DataAccess.Abstract;
 using Tailor.DataAccess.Concrete;
 using Tailor.DataAccess.Context; // ApplicationDbContext için namespace
 using Tailor.Entity.Entities; // AppUser için namespace
+using Swashbuckle.AspNetCore.SwaggerGen; // Swagger geniþletme metodlarý için eklenmeli
+using Swashbuckle.AspNetCore.SwaggerUI;  // Swagger UI geniþletme metodlarý için eklenmeli
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +43,8 @@ builder.Services.AddScoped<ISupportTicketDal, EfSupportTicketDal>();
 builder.Services.AddScoped<IAddressDal, EfAddressDal>();
 builder.Services.AddScoped<IContactMessageDal, EfContactMessageDal>();
 
-
+// API'ye diyoruz ki: "Senden IProductService istenirse, git ProductManager ver."
+builder.Services.AddScoped<IProductService, ProductManager>();
 // B. Business Katmaný (YENÝ - Arkadaþlar buraya kendi managerlarýnýzý ekliyeceksiniz)
 // Generic Service Kaydý (Önemli!):
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericManager<>));
@@ -50,6 +53,12 @@ builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericManager<>));
 // örnek olsun diye yorum satýrý olarak býraktým .
 // builder.Services.AddScoped<IProductService, ProductManager>();
 // builder.Services.AddScoped<ICategoryService, CategoryManager>();
+
+// Swagger Jeneratörünü Servis Olarak Ekle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(); // <--- BU SATIR ÇOK ÖNEMLÝ
+
+
 
 // ---------------------------------------------------------
 // 3. CORS AYARLARI (Frontend Eriþimi Ýçin)
@@ -86,5 +95,14 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+// Configure the HTTP request pipeline.
+// Geliþtirme ortamýndaysak Swagger'ý göster
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(); // <--- BU SATIR ARAYÜZÜ AÇAR
+}
 
 app.Run();
