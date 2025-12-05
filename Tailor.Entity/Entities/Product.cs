@@ -42,7 +42,8 @@ namespace Tailor.Entity.Entities
         // YENİ NAVİGASYON: Eğer kıyafet ise varyantları (Beden/Stok) burada tutulacak.
         public ICollection<ProductVariant> ProductVariants { get; set; }
 
-
+        // Bir ürün birden fazla blog yazısında geçmiş olabilir.
+        public ICollection<BlogProductAssignment> BlogAssignments { get; set; }
 
 
 

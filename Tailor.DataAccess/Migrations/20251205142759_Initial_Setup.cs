@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Tailor.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial_Setup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -138,22 +138,6 @@ namespace Tailor.DataAccess.Migrations
                         principalTable: "Categories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SocialMedias",
-                columns: table => new
-                {
-                    SocialMediaId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PlatformName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IconUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ProfileUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SocialMedias", x => x.SocialMediaId);
                 });
 
             migrationBuilder.CreateTable(
@@ -369,6 +353,30 @@ namespace Tailor.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SocialMedias",
+                columns: table => new
+                {
+                    CustomerSocialId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SocialMediaName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IconUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProfileUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    Icon = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SocialMedias", x => x.CustomerSocialId);
+                    table.ForeignKey(
+                        name: "FK_SocialMedias_AspNetUsers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SupportTickets",
                 columns: table => new
                 {
@@ -405,28 +413,22 @@ namespace Tailor.DataAccess.Migrations
                 columns: table => new
                 {
                     BlogId = table.Column<int>(type: "int", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    BlogCategoryId = table.Column<int>(type: "int", nullable: true)
+                    BlogCategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BlogCategoryAssignments", x => new { x.BlogId, x.CategoryId });
+                    table.PrimaryKey("PK_BlogCategoryAssignments", x => new { x.BlogId, x.BlogCategoryId });
                     table.ForeignKey(
                         name: "FK_BlogCategoryAssignments_BlogCategories_BlogCategoryId",
                         column: x => x.BlogCategoryId,
                         principalTable: "BlogCategories",
-                        principalColumn: "BlogCategoryId");
+                        principalColumn: "BlogCategoryId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BlogCategoryAssignments_Blogs_BlogId",
                         column: x => x.BlogId,
                         principalTable: "Blogs",
                         principalColumn: "BlogId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BlogCategoryAssignments_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -444,16 +446,18 @@ namespace Tailor.DataAccess.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CretaedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Categoryid = table.Column<int>(type: "int", nullable: true)
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    ProductType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.id);
                     table.ForeignKey(
-                        name: "FK_Products_Categories_Categoryid",
-                        column: x => x.Categoryid,
+                        name: "FK_Products_Categories_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -491,6 +495,30 @@ namespace Tailor.DataAccess.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BlogProductAssignment",
+                columns: table => new
+                {
+                    BlogId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BlogProductAssignment", x => new { x.BlogId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_BlogProductAssignment_Blogs_BlogId",
+                        column: x => x.BlogId,
+                        principalTable: "Blogs",
+                        principalColumn: "BlogId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BlogProductAssignment_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -562,12 +590,34 @@ namespace Tailor.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductVariant",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Size = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StockQuantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductVariant", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductVariant_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ShoppingCartItems",
                 columns: table => new
                 {
                     ShoppingCartItemId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ShoppingCartId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
@@ -595,7 +645,7 @@ namespace Tailor.DataAccess.Migrations
                 {
                     StockId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -697,7 +747,7 @@ namespace Tailor.DataAccess.Migrations
                 {
                     OrderItemId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false)
@@ -840,9 +890,9 @@ namespace Tailor.DataAccess.Migrations
                 column: "BlogCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BlogCategoryAssignments_CategoryId",
-                table: "BlogCategoryAssignments",
-                column: "CategoryId");
+                name: "IX_BlogProductAssignment_ProductId",
+                table: "BlogProductAssignment",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentCategoryId",
@@ -892,18 +942,22 @@ namespace Tailor.DataAccess.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ProductProperties_ProductId",
                 table: "ProductProperties",
-                column: "ProductId",
-                unique: true);
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_Categoryid",
+                name: "IX_Products_CategoryId",
                 table: "Products",
-                column: "Categoryid");
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductTags_TagId",
                 table: "ProductTags",
                 column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductVariant_ProductId",
+                table: "ProductVariant",
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SearchLogs_UserId",
@@ -936,6 +990,11 @@ namespace Tailor.DataAccess.Migrations
                 name: "IX_ShoppingCartItems_ShoppingCartId",
                 table: "ShoppingCartItems",
                 column: "ShoppingCartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SocialMedias_CustomerId",
+                table: "SocialMedias",
+                column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stocks_ProductId",
@@ -1008,6 +1067,9 @@ namespace Tailor.DataAccess.Migrations
                 name: "BlogCategoryAssignments");
 
             migrationBuilder.DropTable(
+                name: "BlogProductAssignment");
+
+            migrationBuilder.DropTable(
                 name: "ContactMessages");
 
             migrationBuilder.DropTable(
@@ -1024,6 +1086,9 @@ namespace Tailor.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductTags");
+
+            migrationBuilder.DropTable(
+                name: "ProductVariant");
 
             migrationBuilder.DropTable(
                 name: "SearchLogs");
