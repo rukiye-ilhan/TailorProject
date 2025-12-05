@@ -2,6 +2,7 @@
 using Tailor.DTO.DTOs.BlogDtos;
 using Tailor.DTO.DTOs.CategoryDtos;
 using Tailor.DTO.DTOs.AddressDtos;
+using Tailor.DTO.DTOs.BannerDtos;
 using Tailor.DTO.DTOs.BlogCategoryDtos;
 using Tailor.DTO.DTOs.BlogDtos;
 using Tailor.DTO.DTOs.ContactMessageDtos;
@@ -59,6 +60,11 @@ namespace Tailor.Business.Mapping
 
             CreateMap<SupportTicket, CreateSupportTicketDto>().ReverseMap();
             CreateMap<SupportTicket, ResultSupportTicketDto>().ReverseMap();
+
+            // --- BANNER ---
+            CreateMap<Banner, CreateBannerDto>().ReverseMap();
+            CreateMap<Banner, UpdateBannerDto>().ReverseMap();
+            CreateMap<Banner, ResultBannerDto>().ReverseMap();
 
             // --- USER & ADDRESS ---
             CreateMap<Address, CreateAddressDto>().ReverseMap();

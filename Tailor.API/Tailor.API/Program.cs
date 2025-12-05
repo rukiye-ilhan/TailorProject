@@ -42,8 +42,10 @@ builder.Services.AddScoped<ITestimonialDal, EfTestimonialDal>();
 builder.Services.AddScoped<ISupportTicketDal, EfSupportTicketDal>();
 builder.Services.AddScoped<IAddressDal, EfAddressDal>();
 builder.Services.AddScoped<IContactMessageDal, EfContactMessageDal>();
+builder.Services.AddScoped<IBannerDal, EfBannerDal>();
 
 // API'ye diyoruz ki: "Senden IProductService istenirse, git ProductManager ver."
+builder.Services.AddScoped<IBannerService, BannerManager>();
 builder.Services.AddScoped<IProductService, ProductManager>();
 // B. Business Katmaný (YENÝ - Arkadaþlar buraya kendi managerlarýnýzý ekliyeceksiniz)
 // Generic Service Kaydý (Önemli!):
