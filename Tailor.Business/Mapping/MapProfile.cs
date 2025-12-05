@@ -12,6 +12,7 @@ using Tailor.DTO.DTOs.ProductPropertyDtos;
 using Tailor.DTO.DTOs.ShoppingCartItem;
 using Tailor.DTO.DTOs.SupportTicketDtos;
 using Tailor.Entity.Entities;
+using Tailor.DTO.DTOs.CustomerSocialDtos;
 
 namespace Tailor.Business.Mapping
 {
@@ -64,6 +65,10 @@ namespace Tailor.Business.Mapping
             CreateMap<Address, CreateAddressDto>().ReverseMap();
             CreateMap<Address, UpdateAddressDto>().ReverseMap();
             CreateMap<Address, ResultAddressDto>().ReverseMap();
+
+            CreateMap<CustomerSocial, ResultCustomerSocialDto>().ReverseMap();
+            CreateMap<CustomerSocial, CreateCustomerSocialDto>().ReverseMap();
+            CreateMap<CustomerSocial, UpdateCustomerSocialDto>().ReverseMap();
         }
     }
 }

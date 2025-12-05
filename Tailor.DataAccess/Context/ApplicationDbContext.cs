@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Tailor.Entity.Entities;
@@ -60,7 +61,7 @@ namespace Tailor.DataAccess.Context
         public DbSet<Banner> Banners { get; set; }
         public DbSet<ViewHistory> ViewHistories { get; set; }
         public DbSet<SearchLog> SearchLogs { get; set; }
-        public DbSet<SocialMedia> SocialMedias { get; set; } // SocialMedia.cs dosyanız var
+        public DbSet<CustomerSocial> SocialMedias { get; set; } // SocialMedia.cs dosyanız var
 
 
         // =========================================================
@@ -85,16 +86,17 @@ namespace Tailor.DataAccess.Context
             builder.Entity<ProductTag>()
                 .HasOne(pt => pt.Tag).WithMany(t => t.ProductTags).HasForeignKey(pt => pt.TagId);
 
-            // Blog <-> BlogCategory İlişkisi
+           /* // Blog <-> BlogCategory İlişkisi
             builder.Entity<BlogCategoryAssignment>()
-                .HasKey(bc => new { bc.BlogId, bc.CategoryId }); // BlogId ve CategoryId birleşip anahtar olur.
+                .HasKey(bc => new { bc.BlogId, bc.BlogCategoryId }); // BlogId ve CategoryId birleşip anahtar olur.
 
             builder.Entity<BlogCategoryAssignment>()
                 .HasOne(bc => bc.Blog).WithMany(b => b.CategoryAssignments).HasForeignKey(bc => bc.BlogId);
 
             builder.Entity<BlogCategoryAssignment>()
-                .HasOne(bc => bc.Category).WithMany(c => c.CategoryAssignments).HasForeignKey(bc => bc.CategoryId);
+                .HasOne(bc => bc.BlogCategory).WithMany(c => c.CategoryAssignments).HasForeignKey(bc => bc.BlogCategoryId);
 
+            */
 
             // --------------------------------------------------------
             // B. KRİTİK İLİŞKİLER VE SİLME DAVRANIŞLARI
@@ -199,7 +201,28 @@ namespace Tailor.DataAccess.Context
 
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // --- BLOG & PRODUCT İLİŞKİSİ (Çoka-Çok) ---
 
+            // 1. Composite Key Tanımı (İkisi birleşip tek anahtar olur)
+            builder.Entity<BlogProductAssignment>()
+                .HasKey(x => new { x.BlogId, x.ProductId });
+
+            // 2. İlişkilerin Yönünü Belirtme (Opsiyonel ama Garanti Yöntem)
+            // "Bir Blog'un çoklu ürün ataması vardır ve bunlar BlogId ile bağlanır"
+            builder.Entity<BlogProductAssignment>()
+                .HasOne(x => x.Blog)
+                .WithMany(y => y.ProductAssignments)
+                .HasForeignKey(x => x.BlogId);
+
+            // "Bir Ürün'ün çoklu blog ataması vardır ve bunlar ProductId ile bağlanır"
+            builder.Entity<BlogProductAssignment>()
+                .HasOne(x => x.Product)
+                .WithMany(y => y.BlogAssignments)
+                .HasForeignKey(x => x.ProductId);
+
+            // --- BLOG & BLOG CATEGORY İLİŞKİSİ (Bunu da eklesin) ---
+            builder.Entity<BlogCategoryAssignment>()
+                .HasKey(x => new { x.BlogId, x.BlogCategoryId });
 
 
             // --------------------------------------------------------

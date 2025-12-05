@@ -12,8 +12,8 @@ using Tailor.DataAccess.Context;
 namespace Tailor.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251202174734_AddProductVariants")]
-    partial class AddProductVariants
+    [Migration("20251205142759_Initial_Setup")]
+    partial class Initial_Setup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -390,19 +390,29 @@ namespace Tailor.DataAccess.Migrations
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("BlogCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BlogCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BlogId", "CategoryId");
+                    b.HasKey("BlogId", "BlogCategoryId");
 
                     b.HasIndex("BlogCategoryId");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("BlogCategoryAssignments");
+                });
+
+            modelBuilder.Entity("Tailor.Entity.Entities.BlogProductAssignment", b =>
+                {
+                    b.Property<int>("BlogId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BlogId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("BlogProductAssignment");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.Category", b =>
@@ -476,6 +486,43 @@ namespace Tailor.DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ContactMessages");
+                });
+
+            modelBuilder.Entity("Tailor.Entity.Entities.CustomerSocial", b =>
+                {
+                    b.Property<int>("CustomerSocialId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerSocialId"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProfileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SocialMediaName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CustomerSocialId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("SocialMedias");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.Order", b =>
@@ -589,7 +636,7 @@ namespace Tailor.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int?>("Categoryid")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CretaedAt")
@@ -625,7 +672,7 @@ namespace Tailor.DataAccess.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("Categoryid");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
                 });
@@ -680,8 +727,7 @@ namespace Tailor.DataAccess.Migrations
 
                     b.HasKey("ProductPropertyId");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique();
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductProperties");
                 });
@@ -882,34 +928,6 @@ namespace Tailor.DataAccess.Migrations
                     b.HasIndex("ShoppingCartId");
 
                     b.ToTable("ShoppingCartItems");
-                });
-
-            modelBuilder.Entity("Tailor.Entity.Entities.SocialMedia", b =>
-                {
-                    b.Property<int>("SocialMediaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SocialMediaId"));
-
-                    b.Property<string>("IconUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PlatformName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfileUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SocialMediaId");
-
-                    b.ToTable("SocialMedias");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.Stock", b =>
@@ -1162,9 +1180,11 @@ namespace Tailor.DataAccess.Migrations
 
             modelBuilder.Entity("Tailor.Entity.Entities.BlogCategoryAssignment", b =>
                 {
-                    b.HasOne("Tailor.Entity.Entities.BlogCategory", null)
+                    b.HasOne("Tailor.Entity.Entities.BlogCategory", "BlogCategory")
                         .WithMany("CategoryAssignments")
-                        .HasForeignKey("BlogCategoryId");
+                        .HasForeignKey("BlogCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Tailor.Entity.Entities.Blog", "Blog")
                         .WithMany("CategoryAssignments")
@@ -1172,15 +1192,28 @@ namespace Tailor.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Tailor.Entity.Entities.Category", "Category")
-                        .WithMany("CategoryAssignments")
-                        .HasForeignKey("CategoryId")
+                    b.Navigation("Blog");
+
+                    b.Navigation("BlogCategory");
+                });
+
+            modelBuilder.Entity("Tailor.Entity.Entities.BlogProductAssignment", b =>
+                {
+                    b.HasOne("Tailor.Entity.Entities.Blog", "Blog")
+                        .WithMany("ProductAssignments")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tailor.Entity.Entities.Product", "Product")
+                        .WithMany("BlogAssignments")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Blog");
 
-                    b.Navigation("Category");
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.Category", b =>
@@ -1200,6 +1233,17 @@ namespace Tailor.DataAccess.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Tailor.Entity.Entities.CustomerSocial", b =>
+                {
+                    b.HasOne("Tailor.Entity.Entities.AppUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.Order", b =>
@@ -1261,9 +1305,13 @@ namespace Tailor.DataAccess.Migrations
 
             modelBuilder.Entity("Tailor.Entity.Entities.Product", b =>
                 {
-                    b.HasOne("Tailor.Entity.Entities.Category", null)
+                    b.HasOne("Tailor.Entity.Entities.Category", "Category")
                         .WithMany("Prodacts")
-                        .HasForeignKey("Categoryid");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.ProductDisplay", b =>
@@ -1280,8 +1328,8 @@ namespace Tailor.DataAccess.Migrations
             modelBuilder.Entity("Tailor.Entity.Entities.ProductProperty", b =>
                 {
                     b.HasOne("Tailor.Entity.Entities.Product", null)
-                        .WithOne("property")
-                        .HasForeignKey("Tailor.Entity.Entities.ProductProperty", "ProductId")
+                        .WithMany("ProductProperties")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1472,6 +1520,8 @@ namespace Tailor.DataAccess.Migrations
             modelBuilder.Entity("Tailor.Entity.Entities.Blog", b =>
                 {
                     b.Navigation("CategoryAssignments");
+
+                    b.Navigation("ProductAssignments");
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.BlogCategory", b =>
@@ -1481,8 +1531,6 @@ namespace Tailor.DataAccess.Migrations
 
             modelBuilder.Entity("Tailor.Entity.Entities.Category", b =>
                 {
-                    b.Navigation("CategoryAssignments");
-
                     b.Navigation("ChildCategories");
 
                     b.Navigation("Prodacts");
@@ -1502,11 +1550,15 @@ namespace Tailor.DataAccess.Migrations
 
             modelBuilder.Entity("Tailor.Entity.Entities.Product", b =>
                 {
+                    b.Navigation("BlogAssignments");
+
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderItems");
 
                     b.Navigation("ProductDisplays");
+
+                    b.Navigation("ProductProperties");
 
                     b.Navigation("ProductTags");
 
@@ -1518,9 +1570,6 @@ namespace Tailor.DataAccess.Migrations
                     b.Navigation("Testimonials");
 
                     b.Navigation("ViewHistories");
-
-                    b.Navigation("property")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tailor.Entity.Entities.ShoppingCart", b =>

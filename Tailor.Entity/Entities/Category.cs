@@ -27,6 +27,6 @@ namespace Tailor.Entity.Entities
 
         // --- EKSİK OLAN SATIR BU ---
         // Bir kategorinin hangi bloglarda kullanıldığını tutan liste:
-        public ICollection<BlogCategoryAssignment> CategoryAssignments { get; set; }
+        // silinmeli Ürün kategorisinin blogla işi yok.public ICollection<BlogCategoryAssignment> CategoryAssignments { get; set; }
     }
 }

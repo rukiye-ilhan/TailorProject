@@ -20,6 +20,8 @@ namespace Tailor.Entity.Entities
         public BlogCategory BlogCategory { get; set; }*/
         // Navigasyon Özelliği: Birden fazla kategori atamasına referans verir.
         public ICollection<BlogCategoryAssignment> CategoryAssignments { get; set; }
+        // Bir blog yazısında birden fazla ürün tanıtılabilir.
+        public ICollection<BlogProductAssignment> ProductAssignments { get; set; }
 
     }
 }

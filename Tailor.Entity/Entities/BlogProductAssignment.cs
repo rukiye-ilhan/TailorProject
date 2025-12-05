@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace Tailor.Entity.Entities
 {
-    public class BlogCategoryAssignment
+    //Junction Table
+    public class BlogProductAssignment
     {
         public int BlogId { get; set; }
         public Blog Blog { get; set; }
-        public int BlogCategoryId { get; set; }
-        public BlogCategory BlogCategory { get; set; }
+
+        public int ProductId { get; set; } // Dükkandaki Satılık Ürün
+        public Product Product { get; set; }
     }
 }
